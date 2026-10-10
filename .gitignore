@@ -1,0 +1,26 @@
+# Local design notes and unused outpainting experiments
+.hallmark/
+assets/bad-apple-outpaint*
+tools/build_bad_apple_outpaint.py
+assets/lilygo-reference.jpg
+assets/floating-hearts-preview.png
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local builds and editor files
+build/
+.pio/
+.vscode/
+*.bin
+*.elf
+*.hex
+*.map
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*

@@ -1,0 +1,20 @@
+{
+  "width": 320,
+  "height": 170,
+  "frames": 93,
+  "columns": 8,
+  "fps": 15,
+  "period": 6200,
+  "start": 12.4,
+  "duration": 6.6,
+  "overlap": 0.4,
+  "borderCrop": 4,
+  "framing": "original video scaled to full width, vertical crop with smooth apple tracking",
+  "scaledSize": [
+    320,
+    239
+  ],
+  "source": "https://github.com/bad-apple-lab/Bad-Apple/blob/main/badapple.mp4",
+  "sourceSha256": "d8339642fd3303a0c4971e1564515e82f69ef61b700ce17b681debb19404c23a",
+  "credits": "Bad Apple!! shadow art PV: Anira; music: Alstroemeria Records / nomico; Touhou: ZUN. No audio included."
+}
