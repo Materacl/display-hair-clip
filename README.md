@@ -12,7 +12,7 @@ Turn a tiny display into an animated hair clip: floating hearts, scrolling moods
 
 ## Features
 
-- Eight looping scenes on a **320 × 170** landscape display.
+- Seven looping scenes on a **320 × 170** landscape display.
 - Physical buttons for scene navigation and brightness adjustment.
 - Temporary page dots and a rounded brightness indicator that hide automatically.
 - A monochrome pixel interface with an interactive board, scene picker, pause button, and keyboard controls.
@@ -23,11 +23,10 @@ Turn a tiny display into an animated hair clip: floating hearts, scrolling moods
 1. **Hearts** — floating pixel hearts with highlights, shadows, and twinkling sparks.
 2. **HUNGRY :(** — large red scrolling text.
 3. **FED :)** — large mint scrolling text.
-4. **I LOVE MY BF** — scrolling lettering with a beating pixel heart.
-5. **Equalizer** — colorful pixel bars spanning the screen. Decorative animation; it does not react to sound.
-6. **Cat** — a white pixel cat with green eyes walking from right to left.
-7. **Bad Apple!!** — a silent video loop: a spinning apple, the witch catching it, and a broom flight.
-8. **Loading** — a large monochrome pixel spinner with no caption.
+4. **Equalizer** — colorful pixel bars spanning the screen. Decorative animation; it does not react to sound.
+5. **Cat** — a white pixel cat with green eyes walking from right to left.
+6. **Bad Apple!!** — a silent video loop.
+7. **Loading** — a large monochrome pixel spinner with no caption.
 
 <p>
   <img src="assets/cat-preview.gif" alt="Animated white pixel cat walking left" width="320">
@@ -49,7 +48,7 @@ No installation, build step, or web server is needed. Keep `simulator.css`, `tok
 **Keyboard shortcuts**
 
 - **Left / Right:** previous / next scene; hold to dim / brighten.
-- **1–8:** select a scene directly.
+- **1–7:** select a scene directly.
 - **P:** pause or resume animation.
 - **R:** restart from the first scene at maximum simulator brightness.
 
@@ -127,11 +126,24 @@ Select these options under **Tools** (labels may vary slightly by ESP32 core ver
 - **Upload Speed:** 921600
 - **Port:** the port that appears when the board is connected
 
-### 3. Upload
+### 3. Enter download mode
 
-Connect the board using a USB data cable and click **Upload**. After `Hash of data verified` and the reset message, the first animation should start. Press **RST** if it does not restart automatically.
+With the board connected using a USB data cable, follow this order **before clicking Upload**:
 
-If uploading stalls at `Connecting...`, hold **BOOT**, press and release **RST**, then release **BOOT** and retry. If the port changes in download mode, select the new port. Lower the upload speed to **115200** if the connection is unreliable.
+1. Press and **keep holding BOOT** (the lower-right button).
+2. While still holding **BOOT**, press and release **RST**.
+3. **Release BOOT**. The board is now in download mode; the screen may remain blank.
+4. In Arduino IDE, select the board's port again if it changed.
+
+Do not keep holding BOOT during the upload. This sequence follows the [ESP32-S3 bootloader procedure](https://docs.espressif.com/projects/esptool/en/latest/esp32s3/advanced-topics/boot-mode-selection.html).
+
+### 4. Upload the firmware
+
+After completing the steps above and releasing both buttons, click **Upload** in Arduino IDE.
+
+Wait for `Hash of data verified` and the reset message. If the animation does not start automatically, press and release **RST** with **BOOT released** to run the firmware.
+
+If uploading stalls at `Connecting...`, repeat the download-mode sequence, select the new port if needed, and try Upload again. Lower the upload speed to **115200** if the connection is unreliable.
 
 ## Customize
 
@@ -153,7 +165,7 @@ python -m pip install Pillow
 python tools/build_animation_assets.py
 ```
 
-The generator writes sprite sheets in `assets/`, the RGB565 animation data in `Hairclip/AnimationAssets.h`, and embedded PNG data in `preview.html`. It also checks encoded pixels and animation loop properties. The cat and beating heart each use 32 frames.
+The generator writes sprite sheets in `assets/`, the RGB565 animation data in `Hairclip/AnimationAssets.h`, and embedded PNG data in `preview.html`. It also checks encoded pixels and animation loop properties. The cat's walk cycle uses 32 frames.
 
 ### Bad Apple loop
 

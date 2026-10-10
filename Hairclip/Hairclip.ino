@@ -11,7 +11,7 @@ constexpr int SCREEN_W = 320;
 constexpr int SCREEN_H = 170;
 constexpr int BUTTON_NEXT = 14;
 constexpr int BUTTON_PREV = 0;
-constexpr uint8_t SCENE_COUNT = 8;
+constexpr uint8_t SCENE_COUNT = 7;
 
 ButtonState nextButton(BUTTON_NEXT, 1);
 ButtonState prevButton(BUTTON_PREV, -1);
@@ -75,12 +75,6 @@ const uint8_t *glyphRows(char letter) {
   static const uint8_t F[7] = {31, 16, 16, 30, 16, 16, 16};
   static const uint8_t E[7] = {31, 16, 16, 30, 16, 16, 31};
   static const uint8_t D[7] = {30, 17, 17, 17, 17, 17, 30};
-  static const uint8_t I[7] = {31, 4, 4, 4, 4, 4, 31};
-  static const uint8_t L[7] = {16, 16, 16, 16, 16, 16, 31};
-  static const uint8_t O[7] = {14, 17, 17, 17, 17, 17, 14};
-  static const uint8_t V[7] = {17, 17, 17, 17, 17, 10, 4};
-  static const uint8_t M[7] = {17, 27, 21, 21, 17, 17, 17};
-  static const uint8_t B[7] = {30, 17, 17, 30, 17, 17, 30};
   switch (letter) {
     case 'H': return H;
     case 'U': return U;
@@ -91,12 +85,6 @@ const uint8_t *glyphRows(char letter) {
     case 'F': return F;
     case 'E': return E;
     case 'D': return D;
-    case 'I': return I;
-    case 'L': return L;
-    case 'O': return O;
-    case 'V': return V;
-    case 'M': return M;
-    case 'B': return B;
     default: return D;
   }
 }
@@ -129,20 +117,6 @@ void drawBigWord(const char *word, int x, int y, int cellW, int cellH,
   }
 }
 
-int bigWordWidth(const char *word, int cellW, int letterSpacing) {
-  int width = 0;
-  while (*word) {
-    if (*word == ' ') {
-      width += cellW * 2;
-    } else {
-      width += cellW * 5;
-      if (word[1] && word[1] != ' ') width += cellW + letterSpacing;
-    }
-    ++word;
-  }
-  return width;
-}
-
 void drawAssetFrame(const AnimationAsset &asset, int x, int y, uint16_t index) {
   uint32_t cursor = asset.offsets[index];
   for (int row = 0; row < asset.height; ++row) {
@@ -159,31 +133,6 @@ void drawAssetFrame(const AnimationAsset &asset, int x, int y, uint16_t index) {
 void drawAnimationFrame(const AnimationAsset &asset, int x, int y,
                         uint32_t elapsed, uint32_t period) {
   drawAssetFrame(asset, x, y, (elapsed % period) * asset.frameCount / period);
-}
-
-void drawLoveMessage(uint32_t elapsed) {
-  frame.fillScreen(rgb(0, 0, 0));
-  const int cellW = 9;
-  const int cellH = 9;
-  const int letterSpacing = 2;
-  const int lineHeight = 7 * cellH;
-  const int lineGap = 8;
-  const int top = (SCREEN_H - lineHeight * 2 - lineGap) / 2;
-  const char *topLine = "I LOVE";
-  const char *bottomLine = "MY BF";
-  const int heartGap = 12;
-  const int bottomWidth = bigWordWidth(bottomLine, cellW, letterSpacing)
-                        + heartGap + HEART_BEAT.width;
-  const int bottomX = (SCREEN_W - bottomWidth) / 2;
-  const int bottomY = top + lineHeight + lineGap;
-
-  drawBigWord(topLine, (SCREEN_W - bigWordWidth(topLine, cellW, letterSpacing)) / 2,
-              top, cellW, cellH, letterSpacing, rgb(255, 255, 255));
-  drawBigWord(bottomLine, bottomX, bottomY, cellW, cellH,
-              letterSpacing, rgb(255, 255, 255));
-  drawAnimationFrame(HEART_BEAT,
-                     bottomX + bigWordWidth(bottomLine, cellW, letterSpacing) + heartGap,
-                     bottomY + (lineHeight - HEART_BEAT.height) / 2, elapsed, 900);
 }
 
 float equalizerLevel(float time, int bar) {
@@ -368,10 +317,9 @@ void loop() {
   if (scene == 0) drawHearts(elapsed);
   else if (scene == 1) drawMovingText(elapsed, true);
   else if (scene == 2) drawMovingText(elapsed, false);
-  else if (scene == 3) drawLoveMessage(elapsed);
-  else if (scene == 4) drawEqualizer(elapsed);
-  else if (scene == 5) drawWalkingCat(elapsed);
-  else if (scene == 6) {
+  else if (scene == 3) drawEqualizer(elapsed);
+  else if (scene == 4) drawWalkingCat(elapsed);
+  else if (scene == 5) {
     frame.fillScreen(rgb(0, 0, 0));
     drawAnimationFrame(BAD_APPLE, 0, 0, elapsed, BAD_APPLE_PERIOD_MS);
   } else drawLoading(elapsed);

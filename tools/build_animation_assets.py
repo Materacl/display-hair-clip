@@ -5,7 +5,7 @@ The exported PNG pixels and RGB565 runs are checked for an exact match.
 """
 from base64 import b64encode
 from io import BytesIO
-from math import cos, pi, sin, exp
+from math import cos, pi, sin
 from pathlib import Path
 import json
 
@@ -122,21 +122,8 @@ def pixel_heart(colors=("#b51042", "#ff326c", "#df164f", "#ffb6ce"), size=(16, 1
     return pixel
 
 
-def heart_frame(phase):
-    pixel = pixel_heart()
-    first = (phase-0.10+0.5) % 1 - 0.5
-    second = (phase-0.30+0.5) % 1 - 0.5
-    beat = exp(-(first/0.065)**2) + 0.65*exp(-(second/0.075)**2)
-    size = (14+round(2*beat), 13+round(2*beat))
-    heart = pixel.resize(size, Image.Resampling.NEAREST).resize(
-        (size[0]*4, size[1]*4), Image.Resampling.NEAREST)
-    image = Image.new("RGB", (72, 72), "black")
-    image.paste(heart, ((72-heart.width)//2, (72-heart.height)//2))
-    return image
-
-
 def floating_heart_frame(phase):
-    # Integer scaling preserves the exact outline and shading of the BF heart.
+    # Integer scaling preserves the symmetric pixel outline and shading.
     style = int(phase*FRAME_COUNT) % FRAME_COUNT
     colors = [("#b51042", "#ff326c", "#df164f", "#ffb6ce"),
               ("#9b1437", "#ff465e", "#d62045", "#ffc3ce"),
@@ -241,10 +228,10 @@ def main():
     # Stance must cancel the body's screen travel, so paws do not skate.
     for phase in (0.1, 0.3, 0.5):
         assert abs((foot(phase+0.01, 67)[0]-foot(phase, 67)[0]) - 40*0.01/0.65) < 1e-9
-    for renderer in (cat_frame, heart_frame):
+    for renderer in (cat_frame, floating_heart_frame):
         assert renderer(0).tobytes() == renderer(1).tobytes(), "Animation must loop without a pose jump"
     assets, header_parts = {}, []
-    for name, renderer in (("cat-walk", cat_frame), ("heart-beat", heart_frame),
+    for name, renderer in (("cat-walk", cat_frame),
                            ("floating-hearts", floating_heart_frame)):
         frames = [renderer(index/FRAME_COUNT) for index in range(FRAME_COUNT)]
         if name == "cat-walk":
