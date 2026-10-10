@@ -2,6 +2,8 @@
 
 **Pixel animations for a wearable LilyGO T-Display-S3, with an interactive offline browser simulator.**
 
+[**▶ Open live simulator**](https://materacl.github.io/display-hair-clip/preview.html)
+
 Turn a tiny display into an animated hair clip: floating hearts, scrolling moods, a walking cat, and more. Preview scenes on a clickable model of the board before flashing the hardware.
 
 ![Floating pixel hearts and the pixel equalizer](assets/pixel-scenes-preview.png)
@@ -33,6 +35,10 @@ Turn a tiny display into an animated hair clip: floating hearts, scrolling moods
 </p>
 
 ## Browser simulator
+
+**[Try the live simulator on GitHub Pages](https://materacl.github.io/display-hair-clip/preview.html)** — no download or installation required.
+
+To use the simulator offline:
 
 1. Clone the repository or download and extract its ZIP archive.
 2. Open **[preview.html](preview.html)** in a desktop browser.
