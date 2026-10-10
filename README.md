@@ -220,4 +220,8 @@ tokens.css                 Pixel interface design tokens
 - **Cat Pixel GIF** — [Tenor source](https://tenor.com/view/cat-pixel-gif-9193241577650255034), uploaded by Tobiasssssssxx. Adapted to a white cat on a black background; source metadata is recorded in [assets/cat-source.json](assets/cat-source.json). Upload attribution does not establish authorship or grant a license to the original animation.
 - **Bad Apple!!** — shadow-art PV by Anira; music by Alstroemeria Records / nomico; Touhou by ZUN. [Video source used for the excerpt](https://github.com/bad-apple-lab/Bad-Apple/blob/main/badapple.mp4). No audio is included.
 
-Third-party media and dependencies retain their respective rights and licenses. Attribution does not grant redistribution rights to the Bad Apple footage. No blanket license is applied to those assets by this repository.
+## License
+
+Original project code, documentation, and artwork are licensed under the **[MIT License](LICENSE)**.
+
+Third-party media, fonts, and dependencies retain their respective rights and licenses and are excluded from this MIT grant. This includes the Tenor cat GIF, the Bad Apple footage, and their adapted sprite sheets, previews, and embedded animation data. Pixelify Sans remains under the SIL Open Font License included in `assets/fonts/OFL-PixelifySans.txt`.
