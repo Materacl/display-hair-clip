@@ -5,7 +5,6 @@ The exported PNG pixels and RGB565 runs are checked for an exact match.
 """
 from base64 import b64encode
 from io import BytesIO
-from math import cos, pi, sin
 from pathlib import Path
 import json
 
@@ -15,82 +14,42 @@ ROOT = Path(__file__).resolve().parents[1]
 FRAME_COUNT = 32
 
 
-def foot(phase, anchor_x):
-    """A planted foot travels backwards locally at the screen travel speed."""
-    phase %= 1
-    if phase < 0.65:
-        return anchor_x - 20 + 40*phase/0.65, 119.0
-    swing = (phase-0.65)/0.35
-    ease = swing*swing*(3-2*swing)
-    return anchor_x + 20 - 40*ease, 119 - 13*sin(pi*swing)
-
-
-def cat_frame(phase):
-    """Original pixel cat: front-facing green eyes, side-on body, curled tail."""
-    image = Image.new("RGB", (48, 33), "black")
-    draw = ImageDraw.Draw(image)
-    outline, shade, light, white = "#49485f", "#9baeb8", "#d5e5e5", "#f7fffc"
-    bob = int(cos(phase*4*pi) > 0.35)
-
-    def polygon(points, color):
-        draw.polygon([(x, y+bob) for x, y in points], fill=color)
-
-    def leg(front, offset, far):
-        hip_x = 19 if front else 32
-        toe_x, toe_y = foot(phase+offset, hip_x*4)
-        toe_x, toe_y = round(toe_x/4), round(toe_y/4)
-        hip = (hip_x, 22+bob)
-        # Elbows face back; rear hocks fold forward during the swing.
-        knee = (round((hip_x+toe_x)/2)+(1 if front else -1), 25+bob)
-        ankle = (toe_x+1, toe_y-1)
-        points = [hip, knee, ankle]
-        color = shade if far else white
-        draw.line(points, fill=outline, width=3 if far else 4)
-        draw.rectangle((toe_x-2, toe_y-1, toe_x+1, toe_y+1), fill=outline)
-        draw.line(points, fill=color, width=2)
-        draw.line((toe_x-1, toe_y, toe_x+1, toe_y), fill=color, width=1)
-        if not far:
-            draw.point((toe_x+1, toe_y-1), fill=light)
-
-    # The tail rises from the rump, ending in a little inward hook.
-    sway = round(sin(phase*2*pi))
-    tail = [(34, 19+bob), (38+sway, 15), (41+sway, 10),
-            (41+sway, 6), (40+sway, 4), (37+sway, 4), (35+sway, 6)]
-    draw.line(tail, fill=outline, width=4)
-    draw.line(tail, fill=light, width=2)
-    draw.line([(x, y-1) for x, y in tail], fill=white, width=1)
-
-    leg(False, 0.77, True)
-    leg(True, 0.52, True)
-    leg(False, 0.25, False)
-    leg(True, 0.0, False)
-
-    # A compact stepped silhouette, with a small shoulder and rounded haunch.
-    polygon([(17, 16), (20, 15), (27, 15), (29, 16), (33, 16),
-             (36, 18), (37, 21), (35, 24), (30, 25), (25, 24),
-             (21, 24), (19, 26), (16, 25)], outline)
-    polygon([(18, 17), (21, 16), (26, 16), (29, 17), (33, 17),
-             (35, 19), (36, 21), (34, 23), (30, 24), (25, 23),
-             (21, 23), (18, 25), (17, 24)], light)
-    polygon([(18, 17), (21, 16), (26, 16), (29, 17), (33, 17),
-             (35, 19), (35, 21), (33, 22), (26, 22), (24, 21),
-             (21, 22), (18, 24)], white)
-
-    # Large square head, two pointed ears, no tiny facial lines to lose on LCD.
-    polygon([(6, 11), (7, 9), (8, 6), (10, 8), (11, 9),
-             (15, 9), (18, 6), (19, 8), (20, 11), (21, 12),
-             (21, 18), (19, 20), (16, 21), (9, 20), (6, 18)], outline)
-    polygon([(7, 12), (8, 10), (9, 8), (11, 11), (15, 11),
-             (18, 8), (19, 11), (20, 12), (20, 17),
-             (18, 19), (16, 20), (9, 19), (7, 17)], light)
-    polygon([(7, 12), (8, 10), (9, 8), (11, 11), (15, 11),
-             (18, 8), (19, 11), (19, 17), (17, 19),
-             (10, 19), (7, 17)], white)
-    draw.rectangle((10, 13+bob, 11, 15+bob), fill="#81ce58")
-    draw.rectangle((15, 13+bob, 16, 15+bob), fill="#81ce58")
-    draw.point((10, 13+bob), fill="#b0e88b")
-    draw.point((15, 13+bob), fill="#b0e88b")
-    return image.resize((192, 132), Image.Resampling.NEAREST)
+def load_cat_frames():
+    """Adapt the linked Tenor GIF to a white pixel cat on a black background."""
+    frames, durations = [], []
+    with Image.open(ROOT / "assets/cat-source.gif") as source:
+        for index in range(source.n_frames):
+            source.seek(index)
+            durations.append(source.info.get("duration", 70))
+            # Recover the approximately 4x source pixel grid before scaling it.
+            original = source.convert("RGB").resize((50, 45), Image.Resampling.NEAREST)
+            frame = Image.new("RGB", original.size, "black")
+            for y in range(original.height):
+                for x in range(original.width):
+                    red, green, blue = original.getpixel((x, y))
+                    level = max(red, green, blue)
+                    if level > 220:
+                        color = (0, 0, 0)       # Original white background.
+                    elif level > 100:
+                        color = (248, 252, 255) # White fur.
+                    elif level > 40:
+                        color = (174, 186, 198) # Fur shading.
+                    elif level > 8:
+                        color = (72, 79, 91)    # Outline against black.
+                    else:
+                        color = (16, 20, 27)    # Eyes and facial details.
+                    frame.putpixel((x, y), color)
+            frames.append(frame)
+    # One common crop preserves the original jump positions across all frames.
+    bounds = [frame.getbbox() for frame in frames]
+    crop = (min(box[0] for box in bounds), min(box[1] for box in bounds),
+            max(box[2] for box in bounds), max(box[3] for box in bounds))
+    scale = min(280 // (crop[2]-crop[0]), 154 // (crop[3]-crop[1]))
+    size = ((crop[2]-crop[0])*scale, (crop[3]-crop[1])*scale)
+    frames = [frame.crop(crop).resize(size, Image.Resampling.NEAREST) for frame in frames]
+    if len(set(durations)) != 1:
+        raise ValueError("Cat GIF must use equal frame durations for the shared player")
+    return frames, sum(durations)
 
 
 def pixel_heart(colors=("#b51042", "#ff326c", "#df164f", "#ffb6ce"), size=(16, 15)):
@@ -188,14 +147,6 @@ def pack(name, frames, period=None):
     asset_dir = ROOT / "assets"
     asset_dir.mkdir(exist_ok=True)
     (asset_dir / f"{name}.png").write_bytes(png)
-    if name == "cat-walk":
-        poses = [indexed.crop(((i % 8)*width, (i//8)*height,
-                               (i % 8+1)*width, (i//8+1)*height))
-                 .resize((width*2, height*2), Image.Resampling.NEAREST)
-                 for i in range(FRAME_COUNT)]
-        poses[0].save(asset_dir / "cat-preview.gif", save_all=True,
-                      append_images=poses[1:], duration=([30]*7+[40])*4,
-                      loop=0, optimize=False)
     def array(c_type, label, items, digits):
         lines = [f"static const {c_type} {label}[] PROGMEM = {{"]
         for offset in range(0, len(items), 20):
@@ -218,30 +169,23 @@ def pack(name, frames, period=None):
         # GIF timing has 10 ms precision; distribute rounding without drift.
         durations = [(round((i+1)*period/frame_count/10)-round(i*period/frame_count/10))*10
                      for i in range(frame_count)]
-        poses[0].save(asset_dir / f"{name}-preview.gif", save_all=True,
+        preview_name = "cat-preview.gif" if name == "cat-walk" else f"{name}-preview.gif"
+        poses[0].save(asset_dir / preview_name, save_all=True,
                       append_images=poses[1:], duration=durations, loop=0)
     print(f"{name}: {frame_count} frames, {width}x{height}, {len(palette)} colors, {len(data):,} RLE bytes")
     return header, metadata
 
 
 def main():
-    # Stance must cancel the body's screen travel, so paws do not skate.
-    for phase in (0.1, 0.3, 0.5):
-        assert abs((foot(phase+0.01, 67)[0]-foot(phase, 67)[0]) - 40*0.01/0.65) < 1e-9
-    for renderer in (cat_frame, floating_heart_frame):
-        assert renderer(0).tobytes() == renderer(1).tobytes(), "Animation must loop without a pose jump"
     assets, header_parts = {}, []
-    for name, renderer in (("cat-walk", cat_frame),
-                           ("floating-hearts", floating_heart_frame)):
-        frames = [renderer(index/FRAME_COUNT) for index in range(FRAME_COUNT)]
-        if name == "cat-walk":
-            bounds = [frame.getbbox() for frame in frames]
-            crop = (min(box[0] for box in bounds), min(box[1] for box in bounds),
-                    max(box[2] for box in bounds), max(box[3] for box in bounds))
-            frames = [frame.crop(crop) for frame in frames]
-        header, metadata = pack(name, frames)
-        header_parts.append(header)
-        assets[name] = metadata
+    cat_frames, cat_period = load_cat_frames()
+    header, metadata = pack("cat-walk", cat_frames, cat_period)
+    header_parts.append(header)
+    assets["cat-walk"] = metadata
+    frames = [floating_heart_frame(index/FRAME_COUNT) for index in range(FRAME_COUNT)]
+    header, metadata = pack("floating-hearts", frames)
+    header_parts.append(header)
+    assets["floating-hearts"] = metadata
     video = json.loads((ROOT / "assets/bad-apple-source.json").read_text(encoding="utf-8"))
     with Image.open(ROOT / "assets/bad-apple-source.png") as sheet:
         width, height, columns = video["width"], video["height"], video["columns"]

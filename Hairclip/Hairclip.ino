@@ -177,13 +177,10 @@ void drawEqualizer(uint32_t elapsed) {
   }
 }
 
-void drawWalkingCat(uint32_t elapsed) {
+void drawCat(uint32_t elapsed) {
   frame.fillScreen(rgb(0, 0, 0));
-  // Keep a few pixels visible at both ends so the loop never shows an empty screen.
-  const int cycle = SCREEN_W + CAT_WALK.width - 8;
-  const int travel = static_cast<int>((static_cast<uint64_t>(elapsed) * 4 / 65) % cycle);
-  drawAnimationFrame(CAT_WALK, SCREEN_W - 4 - travel,
-                     (SCREEN_H - CAT_WALK.height) / 2, elapsed, 1000);
+  drawAnimationFrame(CAT_WALK, (SCREEN_W - CAT_WALK.width) / 2,
+                     (SCREEN_H - CAT_WALK.height) / 2, elapsed, CAT_WALK_PERIOD_MS);
 }
 
 void drawLoading(uint32_t elapsed) {
@@ -318,7 +315,7 @@ void loop() {
   else if (scene == 1) drawMovingText(elapsed, true);
   else if (scene == 2) drawMovingText(elapsed, false);
   else if (scene == 3) drawEqualizer(elapsed);
-  else if (scene == 4) drawWalkingCat(elapsed);
+  else if (scene == 4) drawCat(elapsed);
   else if (scene == 5) {
     frame.fillScreen(rgb(0, 0, 0));
     drawAnimationFrame(BAD_APPLE, 0, 0, elapsed, BAD_APPLE_PERIOD_MS);

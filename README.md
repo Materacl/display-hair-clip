@@ -24,12 +24,12 @@ Turn a tiny display into an animated hair clip: floating hearts, scrolling moods
 2. **HUNGRY :(** — large red scrolling text.
 3. **FED :)** — large mint scrolling text.
 4. **Equalizer** — colorful pixel bars spanning the screen. Decorative animation; it does not react to sound.
-5. **Cat** — a white pixel cat with green eyes walking from right to left.
+5. **Cat** — a white pixel cat jumping and flipping on a black background, adapted from the linked Tenor GIF.
 6. **Bad Apple!!** — a silent video loop.
 7. **Loading** — a large monochrome pixel spinner with no caption.
 
 <p>
-  <img src="assets/cat-preview.gif" alt="Animated white pixel cat walking left" width="320">
+  <img src="assets/cat-preview.gif" alt="Animated white pixel cat jumping and flipping" width="260">
   <img src="assets/bad-apple-preview.gif" alt="Silent Bad Apple silhouette animation" width="320">
 </p>
 
@@ -165,7 +165,7 @@ python -m pip install Pillow
 python tools/build_animation_assets.py
 ```
 
-The generator writes sprite sheets in `assets/`, the RGB565 animation data in `Hairclip/AnimationAssets.h`, and embedded PNG data in `preview.html`. It also checks encoded pixels and animation loop properties. The cat's walk cycle uses 32 frames.
+The generator writes sprite sheets in `assets/`, the RGB565 animation data in `Hairclip/AnimationAssets.h`, and embedded PNG data in `preview.html`. It also checks encoded pixels. The cat is imported from `assets/cat-source.gif`: all 21 frames retain their original 70 ms timing (a 1.47-second loop). A common crop preserves its jumping motion; white fur and gray shading replace the original gray palette, and integer scaling keeps the pixel edges sharp. The same frames and timing are used in the firmware and simulator.
 
 ### Bad Apple loop
 
@@ -217,6 +217,7 @@ tokens.css                 Pixel interface design tokens
 - **LilyGO** — [T-Display-S3 hardware reference](https://github.com/Xinyuan-LilyGO/T-Display-S3) and [display library](https://github.com/Xinyuan-LilyGO/LilyGo-display-library). The simulator board illustration is based on the board's appearance, with simplified details.
 - **LovyanGFX** — [display graphics library](https://github.com/lovyan03/LovyanGFX).
 - **Pixelify Sans** — [font source](https://github.com/google/fonts/tree/main/ofl/pixelifysans), distributed under the SIL Open Font License. A copy is included in [assets/fonts/OFL-PixelifySans.txt](assets/fonts/OFL-PixelifySans.txt).
+- **Cat Pixel GIF** — [Tenor source](https://tenor.com/view/cat-pixel-gif-9193241577650255034), uploaded by Tobiasssssssxx. Adapted to a white cat on a black background; source metadata is recorded in [assets/cat-source.json](assets/cat-source.json). Upload attribution does not establish authorship or grant a license to the original animation.
 - **Bad Apple!!** — shadow-art PV by Anira; music by Alstroemeria Records / nomico; Touhou by ZUN. [Video source used for the excerpt](https://github.com/bad-apple-lab/Bad-Apple/blob/main/badapple.mp4). No audio is included.
 
 Third-party media and dependencies retain their respective rights and licenses. Attribution does not grant redistribution rights to the Bad Apple footage. No blanket license is applied to those assets by this repository.
